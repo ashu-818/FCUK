@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCUK – Scroll Animation</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="products.js"></script>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════
+         PRELOADER
+         ═══════════════════════════════════════ -->
+    <div id="preloader">
+        <div class="logo">FC<span>U</span>K</div>
+        <div class="loader-bar">
+            <div class="loader-bar-fill" id="loaderFill"></div>
+        </div>
+        <div class="loader-text" id="loaderText">Loading frames…</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         NAVIGATION
+         ═══════════════════════════════════════ -->
+    <nav id="navbar">
+        <a href="#" class="brand" aria-label="FCUK Home">FCUK</a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#animation-stage">Animation</a>
+            <a href="#features">Features</a>
+            <a href="favorites.html" class="fav-link">♥</a>
+            <a href="cart.html" class="cart-link">🛒<span class="cart-count">0</span></a>
+            <a href="shop.html" class="cta">Shop</a>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════
+         HERO SECTION
+         ═══════════════════════════════════════ -->
+    <section class="hero" id="hero">
+        <div class="badge">✦ Scroll Animation Experience</div>
+        <h1>FC<span class="highlight">U</span>K</h1>
+        <p>
+            Scroll through an immersive frame-by-frame animation.
+            Every pixel tells a story — experience motion like never before.
+        </p>
+        <div class="scroll-indicator"
+             onclick="document.getElementById('animation-stage').scrollIntoView({behavior:'smooth'})"
+             role="button"
+             tabindex="0"
+             aria-label="Scroll to animation">
+            <div class="mouse"><div class="wheel"></div></div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         ANIMATION STAGE
+         ═══════════════════════════════════════ -->
+    <section id="animation-stage" aria-label="Scroll animation viewer">
+        <div class="sticky-wrap">
+            <canvas id="animationCanvas" aria-hidden="true"></canvas>
+        </div>
+        <div class="scroll-spacer"></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         FEATURES SECTION
+         ═══════════════════════════════════════ -->
+    <section class="features" id="features">
+        <div class="grid">
+            <div class="card">
+                <span class="icon" aria-hidden="true">🎬</span>
+                <h3>240 Frames</h3>
+                <p>Buttery-smooth scroll-driven animation built from 240 high-resolution frames.</p>
+            </div>
+            <div class="card">
+                <span class="icon" aria-hidden="true">⚡</span>
+                <h3>Scroll Sync</h3>
+                <p>Every pixel tracks your scroll in real-time for a responsive, cinematic experience.</p>
+            </div>
+            <div class="card">
+                <span class="icon" aria-hidden="true">🌙</span>
+                <h3>Dark Mode</h3>
+                <p>Immersive dark theme designed to make every frame pop with clarity and depth.</p>
+            </div>
+            <div class="card">
+                <span class="icon" aria-hidden="true">📱</span>
+                <h3>Fully Responsive</h3>
+                <p>Flawless across devices — from ultra-wide monitors to mobile screens.</p>
+            </div>
+            <div class="card">
+                <span class="icon" aria-hidden="true">🎯</span>
+                <h3>Pixel Perfect</h3>
+                <p>Original aspect ratio preserved. No cropping, no stretching — just pure motion.</p>
+            </div>
+            <div class="card">
+                <span class="icon" aria-hidden="true">🚀</span>
+                <h3>Optimized</h3>
+                <p>Smart preloading and canvas rendering for silky smooth performance.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         FOOTER
+         ═══════════════════════════════════════ -->
+    <footer>
+        <p>&copy; 2026 <strong>FCUK</strong>. All rights reserved.</p>
+    </footer>
+
+    <!-- ═══════════════════════════════════════
+         SCRIPTS
+         ═══════════════════════════════════════ -->
+    <script src="script.js"></script>
+    <script>updateCartBadge();</script>
+
+</body>
+</html>

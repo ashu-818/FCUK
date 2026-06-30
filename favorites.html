@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCUK – My Favorites</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="products.js"></script>
+    <style>
+        /* ─── Favorites Hero ─── */
+        .fav-hero {
+            width: 100%;
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 140px 24px 50px;
+            background: linear-gradient(180deg, rgba(10,10,10,1) 0%, rgba(10,10,10,0.8) 100%);
+        }
+        .fav-hero h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.4));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+        .fav-hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .fav-hero p {
+            max-width: 500px;
+            font-size: 1rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+        .fav-hero .count {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 4px 16px;
+            border-radius: var(--radius-full);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+        .fav-hero .count strong { color: var(--accent); }
+
+        /* ─── Favorites Grid ─── */
+        .fav-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            min-height: 300px;
+        }
+
+        /* ─── Empty State ─── */
+        .fav-empty {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        .fav-empty.visible { display: flex; }
+        .fav-empty .icon { font-size: 3.5rem; margin-bottom: 16px; }
+        .fav-empty h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+        .fav-empty p { color: var(--text-dim); font-weight: 300; margin-bottom: 24px; }
+        .fav-empty .btn-primary {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.25s ease;
+        }
+        .fav-empty .btn-primary:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        /* ─── Product Card (reused) ─── */
+        .product-card {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow);
+            border-color: var(--border-light);
+        }
+        .product-card .image-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 75%;
+            overflow: hidden;
+            background: var(--surface2);
+        }
+        .product-card .image-wrap img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .product-card:hover .image-wrap img { transform: scale(1.08); }
+        .product-card .image-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.5) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .product-card .badge {
+            position: absolute;
+            top: 12px; left: 12px;
+            z-index: 2;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        .product-card .badge.new { background: #22c55e; }
+        .product-card .badge.sale { background: var(--accent); }
+        .product-card .badge.limited { background: #a855f7; }
+        .product-card .badge.bestseller { background: #f59e0b; }
+        .product-card .remove-btn {
+            position: absolute;
+            top: 12px; right: 12px;
+            z-index: 2;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            color: var(--accent);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+        .product-card .remove-btn:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .product-card .info {
+            padding: 20px 20px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .product-card .info .category {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+        .product-card .info .name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+        .product-card .info .rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            color: #f59e0b;
+        }
+        .product-card .info .rating span {
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+        .product-card .info .price-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+        .product-card .info .price-row .current {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .product-card .info .price-row .original {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+        .product-card .info .price-row .discount {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(255,59,59,0.12);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+        }
+        .product-card .view-btn {
+            margin: 0 20px 20px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-light);
+            background: transparent;
+            color: var(--text);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+            font-family: var(--font);
+            text-decoration: none;
+            text-align: center;
+        }
+        .product-card .view-btn:hover {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-color: transparent;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .fav-hero { min-height: 30vh; padding: 120px 20px 40px; }
+            .fav-grid { padding: 0 20px 60px; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 16px; }
+            .product-card .info { padding: 16px 16px 20px; }
+            .product-card .view-btn { margin: 0 16px 16px; }
+        }
+        @media (max-width: 480px) {
+            .fav-hero { padding: 100px 16px 30px; min-height: 25vh; }
+            .fav-grid { grid-template-columns: 1fr; padding: 0 16px 40px; gap: 14px; }
+            .product-card .info { padding: 12px 12px 14px; }
+            .product-card .info .name { font-size: 0.85rem; }
+            .product-card .view-btn { margin: 0 12px 12px; padding: 8px 14px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Navigation ─── -->
+    <nav id="navbar">
+        <a href="index.html" class="brand" aria-label="FCUK Home">FCUK</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="favorites.html" class="fav-link">♥</a>
+            <a href="cart.html" class="cart-link">🛒<span class="cart-count">0</span></a>
+        </div>
+    </nav>
+
+    <!-- ─── Hero ─── -->
+    <section class="fav-hero">
+        <h1>My <span class="highlight">Favorites</span></h1>
+        <p>Your curated collection of FCUK footwear — saved for later.</p>
+        <div class="count" id="favCount">0 saved</div>
+    </section>
+
+    <!-- ─── Grid ─── -->
+    <div class="fav-grid" id="favGrid"></div>
+
+    <!-- ─── Footer ─── -->
+    <footer>
+        <p>&copy; 2026 <strong>FCUK</strong>. All rights reserved.</p>
+    </footer>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const grid = document.getElementById('favGrid');
+            const countEl = document.getElementById('favCount');
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+
+            // Mobile menu
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+                navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('open')));
+                document.addEventListener('click', (e) => {
+                    if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) navLinks.classList.remove('open');
+                });
+            }
+
+            // Navbar auto-hide
+            let lastScrollY = 0;
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                const sy = window.scrollY;
+                if (sy > lastScrollY && sy > 100) navbar.style.transform = 'translateY(-100%)';
+                else navbar.style.transform = 'translateY(0)';
+                lastScrollY = sy;
+            }, { passive: true });
+
+            function render() {
+                const favs = getFavoriteProducts();
+                countEl.innerHTML = favs.length === 1 ? '<strong>1</strong> item saved' : '<strong>' + favs.length + '</strong> items saved';
+
+                if (favs.length === 0) {
+                    grid.innerHTML = `
+                        <div class="fav-empty visible">
+                            <div class="icon">💔</div>
+                            <h3>No favorites yet</h3>
+                            <p>Start adding shoes to your favorites from the shop.</p>
+                            <a href="shop.html" class="btn-primary">Browse Shop</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                for (const p of favs) {
+                    const badgeHtml = p.badge ? `<span class="badge ${p.badge}">${getBadgeLabel(p.badge)}</span>` : '';
+                    const discount = getDiscountPercent(p.original, p.price);
+                    const discountHtml = discount > 0 ? `<span class="discount">-${discount}%</span>` : '';
+                    const originalHtml = p.original ? `<span class="original">${formatPrice(p.original)}</span>` : '';
+
+                    html += `
+                        <div class="product-card" data-id="${p.id}">
+                            <div class="image-wrap">
+                                <img src="${PRODUCT_IMG}" alt="FCUK ${p.name}" loading="lazy">
+                                ${badgeHtml}
+                                <button class="remove-btn" data-id="${p.id}" aria-label="Remove from favorites">✕</button>
+                            </div>
+                            <div class="info">
+                                <div class="category">${p.category}</div>
+                                <div class="name">FCUK ${p.name}</div>
+                                <div class="rating">${renderStars(p.rating)} <span>(${p.reviews})</span></div>
+                                <div class="price-row">
+                                    <span class="current">${formatPrice(p.price)}</span>
+                                    ${originalHtml}
+                                    ${discountHtml}
+                                </div>
+                            </div>
+                            <a href="product.html?id=${p.id}" class="view-btn">View Details</a>
+                        </div>
+                    `;
+                }
+                grid.innerHTML = html;
+            }
+
+            // Remove from favorites
+            grid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.remove-btn');
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const id = Number(btn.dataset.id);
+                    const favs = getFavorites();
+                    const idx = favs.indexOf(id);
+                    if (idx > -1) {
+                        favs.splice(idx, 1);
+                        saveFavorites(favs);
+                    }
+                    render(); // Re-render
+                }
+            });
+
+            render();
+            updateCartBadge();
+        })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCUK – Cart</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="products.js"></script>
+    <style>
+        /* ─── Cart Hero ─── */
+        .cart-hero {
+            width: 100%;
+            min-height: 35vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 140px 24px 40px;
+            background: linear-gradient(180deg, rgba(10,10,10,1) 0%, rgba(10,10,10,0.8) 100%);
+        }
+        .cart-hero h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.4));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+        }
+        .cart-hero h1 .highlight {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cart-hero p {
+            max-width: 500px;
+            font-size: 1rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+        .cart-hero .count {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 4px 16px;
+            border-radius: var(--radius-full);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+        }
+        .cart-hero .count strong { color: var(--accent); }
+
+        /* ─── Cart Layout ─── */
+        .cart-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* ─── Cart Items ─── */
+        .cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 200px;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 16px;
+            padding: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all var(--transition);
+        }
+        .cart-item:hover { border-color: var(--border-light); }
+
+        .cart-item .item-img {
+            width: 120px;
+            height: 90px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--surface2);
+            flex-shrink: 0;
+        }
+        .cart-item .item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-item .item-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            min-width: 0;
+        }
+        .cart-item .item-details .item-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cart-item .item-details .item-meta {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+        .cart-item .item-details .item-price {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 4px;
+        }
+
+        .cart-item .item-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Quantity controls */
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--bg);
+        }
+        .qty-controls button {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease;
+            font-family: var(--font);
+            font-weight: 600;
+        }
+        .qty-controls button:hover { background: var(--surface2); }
+        .qty-controls .qty-val {
+            min-width: 28px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .cart-item .remove-item {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            transition: color 0.2s ease;
+            font-family: var(--font);
+            font-weight: 500;
+        }
+        .cart-item .remove-item:hover { color: var(--accent); }
+
+        /* ─── Order Summary ─── */
+        .order-summary {
+            position: sticky;
+            top: 100px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+        }
+        .order-summary h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        .order-summary .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .order-summary .summary-row strong { color: var(--text); }
+        .order-summary .summary-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+        .order-summary .summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 0;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .order-summary .checkout-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px 24px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+            font-family: var(--font);
+        }
+        .order-summary .checkout-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        .order-summary .clear-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font);
+        }
+        .order-summary .clear-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* ─── Delivery selector in summary ─── */
+        .summary-delivery select {
+            width: 100%;
+            margin-top: 4px;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.8rem;
+            font-family: var(--font);
+            cursor: pointer;
+            outline: none;
+        }
+        .summary-delivery select:focus { border-color: var(--accent); }
+
+        /* ─── Empty State ─── */
+        .cart-empty {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        .cart-empty.visible { display: flex; }
+        .cart-empty .icon { font-size: 3.5rem; margin-bottom: 16px; }
+        .cart-empty h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+        .cart-empty p { color: var(--text-dim); font-weight: 300; margin-bottom: 24px; }
+        .cart-empty .btn-primary {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.25s ease;
+        }
+        .cart-empty .btn-primary:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        /* ─── Success Modal ─── */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .success-overlay.visible { display: flex; }
+        .success-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .success-modal .icon { font-size: 3rem; margin-bottom: 16px; }
+        .success-modal h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+        .success-modal p { color: var(--text-dim); font-weight: 300; font-size: 0.9rem; margin-bottom: 24px; }
+        .success-modal .btn {
+            padding: 12px 32px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font);
+            transition: all 0.25s ease;
+        }
+        .success-modal .btn:hover { transform: scale(1.04); box-shadow: 0 4px 20px var(--accent-glow); }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 900px) {
+            .cart-layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .order-summary { position: static; }
+        }
+        @media (max-width: 768px) {
+            .cart-hero { min-height: 28vh; padding: 120px 20px 30px; }
+            .cart-layout { padding: 0 20px 60px; }
+            .cart-item {
+                grid-template-columns: 80px 1fr auto;
+                padding: 14px;
+                gap: 12px;
+            }
+            .cart-item .item-img {
+                width: 80px;
+                height: 60px;
+            }
+            .cart-item .item-details .item-name { font-size: 0.85rem; }
+            .cart-item .item-details .item-price { font-size: 0.9rem; }
+            .order-summary { padding: 20px; }
+        }
+        @media (max-width: 480px) {
+            .cart-hero { padding: 100px 16px 24px; min-height: 22vh; }
+            .cart-hero h1 { font-size: 1.6rem; }
+            .cart-layout { padding: 0 16px 40px; gap: 16px; }
+            .cart-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 12px;
+            }
+            .cart-item .item-img {
+                width: 100%;
+                height: 120px;
+            }
+            .cart-item .item-actions {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+            .order-summary { padding: 16px; }
+            .order-summary h3 { font-size: 1rem; }
+            .order-summary .summary-total { font-size: 1rem; }
+            .order-summary .checkout-btn { padding: 12px 20px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Navigation ─── -->
+    <nav id="navbar">
+        <a href="index.html" class="brand" aria-label="FCUK Home">FCUK</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="favorites.html" class="fav-link">♥</a>
+            <a href="cart.html" class="cart-link">🛒<span class="cart-count">0</span></a>
+        </div>
+    </nav>
+
+    <!-- ─── Hero ─── -->
+    <section class="cart-hero">
+        <h1>Shopping <span class="highlight">Cart</span></h1>
+        <p>Review your items, adjust quantities, and checkout when you're ready.</p>
+        <div class="count" id="cartCount">0 items</div>
+    </section>
+
+    <!-- ─── Cart Layout ─── -->
+    <div class="cart-layout" id="cartLayout">
+        <div class="cart-items" id="cartItems"></div>
+        <div class="order-summary" id="orderSummary"></div>
+
+        <!-- Empty state (shown when cart is empty) -->
+        <div class="cart-empty" id="cartEmpty">
+            <div class="icon">🛒</div>
+            <h3>Your cart is empty</h3>
+            <p>Add some FCUK shoes to get started.</p>
+            <a href="shop.html" class="btn-primary">Browse Shop</a>
+        </div>
+    </div>
+
+    <!-- ─── Success Modal ─── -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-modal">
+            <div class="icon">🎉</div>
+            <h3 id="successTitle">Order Placed!</h3>
+            <p id="successText">Your FCUK shoes are on the way.</p>
+            <button class="btn" onclick="closeCheckoutModal()">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- ─── Footer ─── -->
+    <footer>
+        <p>&copy; 2026 <strong>FCUK</strong>. All rights reserved.</p>
+    </footer>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // ─── DOM Refs ───
+            const cartItemsEl = document.getElementById('cartItems');
+            const orderSummaryEl = document.getElementById('orderSummary');
+            const cartCountEl = document.getElementById('cartCount');
+            const cartEmptyEl = document.getElementById('cartEmpty');
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+            const successOverlay = document.getElementById('successOverlay');
+
+            // ─── Mobile Menu ───
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+                navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('open')));
+                document.addEventListener('click', (e) => {
+                    if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) navLinks.classList.remove('open');
+                });
+            }
+
+            // ─── Navbar auto-hide ───
+            let lastScrollY = 0;
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                const sy = window.scrollY;
+                if (sy > lastScrollY && sy > 100) navbar.style.transform = 'translateY(-100%)';
+                else navbar.style.transform = 'translateY(0)';
+                lastScrollY = sy;
+            }, { passive: true });
+
+            // ─── Delivery cost mapping ───
+            const DELIVERY_COST = { standard: 0, express: 9.99, pickup: 0 };
+            const DELIVERY_LABEL = { standard: 'Standard (5–7 days)', express: 'Express (2–3 days)', pickup: 'Store Pickup' };
+
+            // ─── Render Cart ───
+            function render() {
+                const cartProducts = getCartProducts();
+                const count = getCartCount();
+
+                // Update hero count
+                cartCountEl.innerHTML = count === 1 ? '<strong>1</strong> item' : '<strong>' + count + '</strong> items';
+
+                if (cartProducts.length === 0) {
+                    cartItemsEl.innerHTML = '';
+                    orderSummaryEl.innerHTML = '';
+                    cartEmptyEl.classList.add('visible');
+                    updateCartBadge();
+                    return;
+                }
+                cartEmptyEl.classList.remove('visible');
+
+                // ─── Cart Items ───
+                let itemsHtml = '';
+                for (const item of cartProducts) {
+                    const totalPrice = item.product.price * item.quantity;
+                    itemsHtml += `
+                        <div class="cart-item" data-id="${item.id}" data-size="${item.size}">
+                            <div class="item-img">
+                                <img src="${PRODUCT_IMG}" alt="FCUK ${item.product.name}" loading="lazy">
+                            </div>
+                            <div class="item-details">
+                                <div class="item-name">FCUK ${item.product.name}</div>
+                                <div class="item-meta">US ${item.size} · ${item.product.category}</div>
+                                <div class="item-price">${formatPrice(totalPrice)}</div>
+                            </div>
+                            <div class="item-actions">
+                                <div class="qty-controls">
+                                    <button class="qty-minus" data-id="${item.id}" data-size="${item.size}" aria-label="Decrease quantity">−</button>
+                                    <span class="qty-val">${item.quantity}</span>
+                                    <button class="qty-plus" data-id="${item.id}" data-size="${item.size}" aria-label="Increase quantity">+</button>
+                                </div>
+                                <button class="remove-item" data-id="${item.id}" data-size="${item.size}">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                cartItemsEl.innerHTML = itemsHtml;
+
+                // ─── Order Summary ───
+                const subtotal = getCartTotal();
+                // Read selected delivery from the dropdown (default standard)
+                const delivery = document.getElementById('deliverySelect') ? document.getElementById('deliverySelect').value : 'standard';
+                const deliveryCost = DELIVERY_COST[delivery] || 0;
+                const total = subtotal + deliveryCost;
+
+                orderSummaryEl.innerHTML = `
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal (${count} item${count !== 1 ? 's' : ''})</span>
+                        <strong>${formatPrice(subtotal)}</strong>
+                    </div>
+                    <div class="summary-row summary-delivery">
+                        <span>Delivery</span>
+                        <select id="deliverySelect">
+                            <option value="standard">Standard (FREE)</option>
+                            <option value="express">Express (+$9.99)</option>
+                            <option value="pickup">Store Pickup (FREE)</option>
+                        </select>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery cost</span>
+                        <strong>${deliveryCost === 0 ? 'FREE' : '$' + deliveryCost.toFixed(2)}</strong>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span>${formatPrice(total)}</span>
+                    </div>
+                    <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+                    <button class="clear-btn" id="clearCartBtn">Clear Cart</button>
+                `;
+
+                // ─── Delivery change handler ───
+                document.getElementById('deliverySelect').addEventListener('change', () => {
+                    render(); // Re-render summary with new delivery cost
+                });
+
+                // ─── Checkout ───
+                document.getElementById('checkoutBtn').addEventListener('click', () => {
+                    const d = document.getElementById('deliverySelect').value;
+                    const dLabel = DELIVERY_LABEL[d] || 'Standard';
+                    const dCost = DELIVERY_COST[d] || 0;
+                    const subtotal2 = getCartTotal();
+                    const total2 = subtotal2 + dCost;
+                    document.getElementById('successTitle').textContent = '🎉 Order Placed!';
+                    document.getElementById('successText').innerHTML =
+                        'Total: <strong>' + formatPrice(total2) + '</strong><br>' +
+                        'Delivery: ' + dLabel + '<br>' +
+                        'Thank you for shopping with FCUK.';
+                    successOverlay.classList.add('visible');
+                    clearCart();
+                    render();
+                });
+
+                // ─── Clear Cart ───
+                document.getElementById('clearCartBtn').addEventListener('click', () => {
+                    if (confirm('Clear your entire cart?')) {
+                        clearCart();
+                        render();
+                    }
+                });
+
+                updateCartBadge();
+            }
+
+            // ─── Quantity / Remove event delegation ───
+            cartItemsEl.addEventListener('click', (e) => {
+                const target = e.target;
+
+                // Minus
+                if (target.classList.contains('qty-minus')) {
+                    const id = Number(target.dataset.id);
+                    const size = Number(target.dataset.size);
+                    const items = getCart();
+                    const item = items.find(i => i.id === id && i.size === size);
+                    if (item) {
+                        if (item.quantity <= 1) {
+                            removeFromCart(id, size);
+                        } else {
+                            updateQuantity(id, size, item.quantity - 1);
+                        }
+                        render();
+                    }
+                    return;
+                }
+
+                // Plus
+                if (target.classList.contains('qty-plus')) {
+                    const id = Number(target.dataset.id);
+                    const size = Number(target.dataset.size);
+                    const items = getCart();
+                    const item = items.find(i => i.id === id && i.size === size);
+                    if (item) {
+                        updateQuantity(id, size, item.quantity + 1);
+                        render();
+                    }
+                    return;
+                }
+
+                // Remove
+                if (target.classList.contains('remove-item')) {
+                    const id = Number(target.dataset.id);
+                    const size = Number(target.dataset.size);
+                    removeFromCart(id, size);
+                    render();
+                    return;
+                }
+            });
+
+            // ─── Init ───
+            render();
+        })();
+
+        // ─── Close modal (global) ───
+        function closeCheckoutModal() {
+            document.getElementById('successOverlay').classList.remove('visible');
+        }
+    </script>
+
+</body>
+</html>

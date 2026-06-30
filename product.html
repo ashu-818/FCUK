@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCUK – Product</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="products.js"></script>
+    <style>
+        /* ─── Product Page ─── */
+        .product-page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 40px 80px;
+        }
+
+        .product-page .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 32px;
+            transition: color 0.2s ease;
+            padding: 4px 0;
+        }
+        .product-page .back-link:hover { color: var(--text); }
+
+        /* ─── Product Layout ─── */
+        .product-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        /* ─── Image ─── */
+        .product-image-wrap {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+        .product-image-wrap img {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+        }
+        .product-image-wrap .badge {
+            position: absolute;
+            top: 16px; left: 16px;
+            padding: 6px 16px;
+            border-radius: var(--radius-full);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        .product-image-wrap .badge.new { background: #22c55e; }
+        .product-image-wrap .badge.sale { background: var(--accent); }
+        .product-image-wrap .badge.limited { background: #a855f7; }
+        .product-image-wrap .badge.bestseller { background: #f59e0b; }
+
+        .product-image-wrap .fav-toggle {
+            position: absolute;
+            top: 16px; right: 16px;
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+        .product-image-wrap .fav-toggle:hover { transform: scale(1.1); }
+        .product-image-wrap .fav-toggle.active { color: var(--accent); }
+
+        /* ─── Info ─── */
+        .product-info { display: flex; flex-direction: column; gap: 20px; }
+
+        .product-info .category {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 500;
+        }
+        .product-info h1 {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--text);
+            margin: 0;
+        }
+        .product-info .rating-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .product-info .rating-row .stars { color: #f59e0b; font-size: 1rem; }
+        .product-info .rating-row .reviews { color: var(--text-muted); font-size: 0.8rem; }
+
+        .product-info .price-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .product-info .price-row .current {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .product-info .price-row .original {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+        .product-info .price-row .discount {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(255,59,59,0.12);
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+        }
+
+        /* ─── Size Selector ─── */
+        .size-section { margin-top: 4px; }
+        .size-section .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .size-section .label .hint { color: var(--text-muted); font-weight: 400; font-size: 0.75rem; }
+        .size-options {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+        .size-options .size-btn {
+            padding: 12px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-family: var(--font);
+        }
+        .size-options .size-btn:hover {
+            border-color: var(--border-light);
+            background: var(--surface2);
+        }
+        .size-options .size-btn.selected {
+            border-color: var(--accent);
+            background: rgba(255,59,59,0.1);
+            color: var(--accent);
+        }
+
+        /* ─── Delivery ─── */
+        .delivery-section { margin-top: 4px; }
+        .delivery-section .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .delivery-options { display: flex; flex-direction: column; gap: 8px; }
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .delivery-option:hover { border-color: var(--border-light); background: var(--surface2); }
+        .delivery-option.selected { border-color: var(--accent); background: rgba(255,59,59,0.06); }
+        .delivery-option .radio {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .delivery-option.selected .radio { border-color: var(--accent); }
+        .delivery-option.selected .radio::after {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .delivery-option .info { flex: 1; }
+        .delivery-option .info .title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .delivery-option .info .desc {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+        .delivery-option .eta {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        /* ─── Payment ─── */
+        .payment-section { margin-top: 4px; }
+        .payment-section .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .payment-option:hover { border-color: var(--border-light); background: var(--surface2); }
+        .payment-option.selected { border-color: var(--accent); background: rgba(255,59,59,0.06); }
+        .payment-option .icon { font-size: 1.5rem; }
+        .payment-option .info { flex: 1; }
+        .payment-option .info .title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .payment-option .info .desc {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        /* ─── Action Buttons ─── */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .action-buttons .btn {
+            padding: 16px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+            font-family: var(--font);
+            border: none;
+            text-align: center;
+        }
+        .action-buttons .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+        }
+        .action-buttons .btn-primary:hover { transform: scale(1.02); box-shadow: 0 4px 20px var(--accent-glow); }
+        .action-buttons .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border-light);
+        }
+        .action-buttons .btn-secondary:hover { background: var(--surface); border-color: var(--text-dim); }
+
+        /* ─── Success Modal ─── */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .success-overlay.visible { display: flex; }
+        .success-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .success-modal .icon { font-size: 3rem; margin-bottom: 16px; }
+        .success-modal h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+        .success-modal p { color: var(--text-dim); font-weight: 300; font-size: 0.9rem; margin-bottom: 24px; }
+        .success-modal .btn {
+            padding: 12px 32px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: var(--font);
+            transition: all 0.25s ease;
+        }
+        .success-modal .btn:hover { transform: scale(1.04); box-shadow: 0 4px 20px var(--accent-glow); }
+        .success-modal .btn-ghost {
+            background: transparent;
+            color: var(--text-dim);
+            margin-top: 8px;
+            display: inline-block;
+        }
+        .success-modal .btn-ghost:hover { color: var(--text); }
+
+        /* ─── Not Found ─── */
+        .not-found {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 24px;
+        }
+        .not-found .icon { font-size: 3rem; margin-bottom: 16px; }
+        .not-found h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+        .not-found p { color: var(--text-dim); margin-bottom: 24px; }
+        .not-found a {
+            display: inline-block;
+            padding: 12px 32px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+        .not-found a:hover { transform: scale(1.04); }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .product-page { padding: 100px 20px 60px; }
+            .product-layout { grid-template-columns: 1fr; gap: 32px; }
+            .size-options { grid-template-columns: repeat(3, 1fr); }
+            .payment-options { grid-template-columns: 1fr; }
+            .action-buttons { grid-template-columns: 1fr; }
+            .action-buttons .btn { padding: 14px 20px; font-size: 0.85rem; }
+        }
+        @media (max-width: 480px) {
+            .product-page { padding: 80px 16px 40px; }
+            .product-layout { gap: 24px; }
+            .product-info .price-row .current { font-size: 1.6rem; }
+            .size-options { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .size-options .size-btn { padding: 10px 6px; font-size: 0.8rem; }
+            .delivery-option { padding: 12px; }
+            .payment-option { padding: 12px; }
+            .success-modal { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── Navigation ─── -->
+    <nav id="navbar">
+        <a href="index.html" class="brand" aria-label="FCUK Home">FCUK</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="favorites.html" class="fav-link">♥</a>
+            <a href="cart.html" class="cart-link">🛒<span class="cart-count">0</span></a>
+        </div>
+    </nav>
+
+    <!-- ─── Product Page ─── -->
+    <main class="product-page" id="productPage">
+        <a href="javascript:history.back()" class="back-link">← Back</a>
+        <div class="product-layout" id="productContent">
+            <!-- Populated by JS -->
+        </div>
+    </main>
+
+    <!-- ─── Success Modal ─── -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-modal">
+            <div class="icon">✅</div>
+            <h3 id="successTitle">Order Placed!</h3>
+            <p id="successText">Your FCUK shoes are on the way.</p>
+            <button class="btn" onclick="document.getElementById('successOverlay').classList.remove('visible')">Continue Shopping</button>
+            <br>
+            <button class="btn btn-ghost" onclick="document.getElementById('successOverlay').classList.remove('visible')">Close</button>
+        </div>
+    </div>
+
+    <!-- ─── Footer ─── -->
+    <footer>
+        <p>&copy; 2026 <strong>FCUK</strong>. All rights reserved.</p>
+    </footer>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // ─── State ───
+            let selectedSize = null;
+            let selectedDelivery = null;
+            let selectedPayment = null;
+
+            // ─── DOM Refs ───
+            const content = document.getElementById('productContent');
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+
+            // ─── Mobile Menu ───
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+                navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => navLinks.classList.remove('open')));
+                document.addEventListener('click', (e) => {
+                    if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) navLinks.classList.remove('open');
+                });
+            }
+
+            // ─── Navbar auto-hide ───
+            let lastScrollY = 0;
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                const sy = window.scrollY;
+                if (sy > lastScrollY && sy > 100) navbar.style.transform = 'translateY(-100%)';
+                else navbar.style.transform = 'translateY(0)';
+                lastScrollY = sy;
+            }, { passive: true });
+
+            // ─── Get product ID from URL ───
+            function getProductId() {
+                const params = new URLSearchParams(window.location.search);
+                return Number(params.get('id')) || 0;
+            }
+
+            // ─── Render ───
+            function render() {
+                const id = getProductId();
+                const product = getProductById(id);
+
+                if (!product) {
+                    content.innerHTML = `
+                        <div class="not-found">
+                            <div class="icon">🔍</div>
+                            <h2>Product not found</h2>
+                            <p>The shoe you're looking for doesn't exist or has been removed.</p>
+                            <a href="shop.html">Browse Shop</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const isFav = isFavorite(product.id);
+                const discount = getDiscountPercent(product.original, product.price);
+                const badgeHtml = product.badge ? `<span class="badge ${product.badge}">${getBadgeLabel(product.badge)}</span>` : '';
+                const discountHtml = discount > 0 ? `<span class="discount">-${discount}%</span>` : '';
+                const originalHtml = product.original ? `<span class="original">${formatPrice(product.original)}</span>` : '';
+
+                // Set page title
+                document.title = 'FCUK ' + product.name + ' – Product';
+
+                content.innerHTML = `
+                    <!-- Image -->
+                    <div class="product-image-wrap">
+                        <img src="${PRODUCT_IMG}" alt="FCUK ${product.name}">
+                        ${badgeHtml}
+                        <button class="fav-toggle ${isFav ? 'active' : ''}" id="favToggle" aria-label="Toggle favorite">${isFav ? '♥' : '♡'}</button>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="product-info">
+                        <div class="category">${product.category}</div>
+                        <h1>FCUK ${product.name}</h1>
+                        <div class="rating-row">
+                            <span class="stars">${renderStars(product.rating)}</span>
+                            <span class="reviews">(${product.reviews} reviews)</span>
+                        </div>
+                        <div class="price-row">
+                            <span class="current">${formatPrice(product.price)}</span>
+                            ${originalHtml}
+                            ${discountHtml}
+                        </div>
+
+                        <!-- Size -->
+                        <div class="size-section">
+                            <div class="label">
+                                <span>Select Size</span>
+                                <span class="hint" id="sizeHint">Choose a size</span>
+                            </div>
+                            <div class="size-options" id="sizeOptions">
+                                ${[7, 8, 9, 10, 11, 12].map(s => `
+                                    <button class="size-btn" data-size="${s}">US ${s}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Delivery -->
+                        <div class="delivery-section">
+                            <div class="label">Delivery Method</div>
+                            <div class="delivery-options" id="deliveryOptions">
+                                <div class="delivery-option selected" data-delivery="standard">
+                                    <div class="radio"></div>
+                                    <div class="info">
+                                        <div class="title">Standard Shipping</div>
+                                        <div class="desc">5–7 business days</div>
+                                    </div>
+                                    <div class="eta">FREE</div>
+                                </div>
+                                <div class="delivery-option" data-delivery="express">
+                                    <div class="radio"></div>
+                                    <div class="info">
+                                        <div class="title">Express Shipping</div>
+                                        <div class="desc">2–3 business days</div>
+                                    </div>
+                                    <div class="eta">$9.99</div>
+                                </div>
+                                <div class="delivery-option" data-delivery="pickup">
+                                    <div class="radio"></div>
+                                    <div class="info">
+                                        <div class="title">Store Pickup</div>
+                                        <div class="desc">Pick up at nearest FCUK store</div>
+                                    </div>
+                                    <div class="eta">FREE</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment -->
+                        <div class="payment-section">
+                            <div class="label">Payment Method</div>
+                            <div class="payment-options" id="paymentOptions">
+                                <div class="payment-option selected" data-payment="upi">
+                                    <span class="icon">📱</span>
+                                    <div class="info">
+                                        <div class="title">UPI</div>
+                                        <div class="desc">Google Pay · PhonePe · Paytm</div>
+                                    </div>
+                                </div>
+                                <div class="payment-option" data-payment="cod">
+                                    <span class="icon">💵</span>
+                                    <div class="info">
+                                        <div class="title">Cash on Delivery</div>
+                                        <div class="desc">Pay when you receive</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="buyNowBtn">Buy Now</button>
+                            <button class="btn btn-secondary" id="addCartBtn">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+
+                // Reset state
+                selectedSize = null;
+                selectedDelivery = 'standard';
+                selectedPayment = 'upi';
+                document.getElementById('sizeHint').textContent = 'Choose a size';
+
+                // ─── Size click ───
+                document.getElementById('sizeOptions').addEventListener('click', (e) => {
+                    const btn = e.target.closest('.size-btn');
+                    if (!btn) return;
+                    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedSize = Number(btn.dataset.size);
+                    document.getElementById('sizeHint').textContent = 'US ' + selectedSize;
+                });
+
+                // ─── Delivery click ───
+                document.getElementById('deliveryOptions').addEventListener('click', (e) => {
+                    const opt = e.target.closest('.delivery-option');
+                    if (!opt) return;
+                    document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedDelivery = opt.dataset.delivery;
+                });
+
+                // ─── Payment click ───
+                document.getElementById('paymentOptions').addEventListener('click', (e) => {
+                    const opt = e.target.closest('.payment-option');
+                    if (!opt) return;
+                    document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedPayment = opt.dataset.payment;
+                });
+
+                // ─── Fav Toggle ───
+                document.getElementById('favToggle').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    const nowFav = toggleFavorite(product.id);
+                    btn.textContent = nowFav ? '♥' : '♡';
+                    btn.classList.toggle('active', nowFav);
+                });
+
+                // ─── Buy Now ───
+                document.getElementById('buyNowBtn').addEventListener('click', () => {
+                    if (!selectedSize) {
+                        document.getElementById('sizeHint').textContent = '⚠️ Please select a size';
+                        document.getElementById('sizeHint').style.color = 'var(--accent)';
+                        setTimeout(() => {
+                            document.getElementById('sizeHint').textContent = 'Choose a size';
+                            document.getElementById('sizeHint').style.color = '';
+                        }, 2000);
+                        return;
+                    }
+                    const paymentLabel = selectedPayment === 'upi' ? 'UPI' : 'Cash on Delivery';
+                    const deliveryCost = selectedDelivery === 'express' ? '$9.99' : 'FREE';
+                    document.getElementById('successTitle').textContent = '🎉 Order Placed!';
+                    document.getElementById('successText').innerHTML =
+                        'FCUK ${product.name} (US ${selectedSize})<br>' +
+                        'Payment: ${paymentLabel} · Delivery: ${deliveryCost}<br>' +
+                        '<strong>${formatPrice(product.price)}</strong>';
+                    document.getElementById('successOverlay').classList.add('visible');
+                });
+
+                // ─── Add to Cart (localStorage via products.js) ───
+                document.getElementById('addCartBtn').addEventListener('click', () => {
+                    if (!selectedSize) {
+                        document.getElementById('sizeHint').textContent = '⚠️ Please select a size';
+                        document.getElementById('sizeHint').style.color = 'var(--accent)';
+                        setTimeout(() => {
+                            document.getElementById('sizeHint').textContent = 'Choose a size';
+                            document.getElementById('sizeHint').style.color = '';
+                        }, 2000);
+                        return;
+                    }
+                    addToCart(product.id, selectedSize);
+                    const btn = document.getElementById('addCartBtn');
+                    const orig = btn.textContent;
+                    btn.textContent = '✓ Added to Cart';
+                    btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+                    btn.style.borderColor = 'transparent';
+                    btn.style.color = '#fff';
+                    setTimeout(() => {
+                        btn.textContent = orig;
+                        btn.style.background = '';
+                        btn.style.borderColor = '';
+                        btn.style.color = '';
+                    }, 2000);
+                });
+            }
+
+            render();
+            updateCartBadge();
+        })();
+    </script>
+
+</body>
+</html>
