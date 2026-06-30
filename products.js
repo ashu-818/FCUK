@@ -28,7 +28,7 @@ const PRODUCTS = [
 ];
 
 // ─── Image path ───
-const PRODUCT_IMG = 'frames/ezgif-frame-240.jpg';
+const PRODUCT_IMG = 'frames/part3/ezgif-frame-240.jpg';
 
 // ─── Favorites (localStorage) ───
 function getFavorites() {

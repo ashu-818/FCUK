@@ -143,7 +143,8 @@
     // ═══════════════════════════════════════════════
     function preloadFrames() {
         return new Promise((resolve) => {
-            const { totalFrames, framesDir, filenamePrefix, filenameExt } = CONFIG;
+            const { totalFrames, filenamePrefix, filenameExt } = CONFIG;
+            const framesDir = 'frames/';
             state.frames = new Array(totalFrames);
             state.loadedCount = 0;
 
@@ -186,7 +187,8 @@
                         checkBatchComplete();
                     };
 
-                    img.src = framesDir + filenamePrefix + pad(i + 1) + filenameExt;
+                    const part = i < 80 ? 'part1/' : i < 160 ? 'part2/' : 'part3/';
+                    img.src = framesDir + part + filenamePrefix + pad(i + 1) + filenameExt;
                 }
 
                 function checkBatchComplete() {
